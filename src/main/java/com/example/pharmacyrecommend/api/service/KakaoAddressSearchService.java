@@ -2,6 +2,7 @@ package com.example.pharmacyrecommend.api.service;
 
 
 import com.example.pharmacyrecommend.api.dto.KakaoApiResponseDto;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,8 +12,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
-
-import java.net.URI;
 
 @Slf4j
 @Service
@@ -40,8 +39,6 @@ public class KakaoAddressSearchService {
 
 
     }
-
-
 
 
 }
