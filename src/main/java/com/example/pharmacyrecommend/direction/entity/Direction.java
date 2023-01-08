@@ -22,7 +22,7 @@ public class Direction {
 
   // User
   private String inputAddress;
-  private String inputLatitude;
+  private double inputLatitude;
   private double inputLongitude;
 
   // Pharmacy's address

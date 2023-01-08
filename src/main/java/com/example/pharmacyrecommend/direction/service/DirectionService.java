@@ -2,9 +2,12 @@ package com.example.pharmacyrecommend.direction.service;
 
 import com.example.pharmacyrecommend.api.dto.DocumentDto;
 import com.example.pharmacyrecommend.direction.entity.Direction;
-import com.example.pharmacyrecommend.pharmacy.dto.PharmacyDto;
 import com.example.pharmacyrecommend.pharmacy.service.PharmacySearchService;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,16 +17,39 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DirectionService {
 
+  // Maximum number of pharmacies to be recommended
+  private static final int MAX_SEARCH_COUNT = 3;
+  // Maximum distance to be recommended
+  private static final double RADIUS_KM = 10.0;
+
   private final PharmacySearchService pharmacySearchService;
 
   public List<Direction> buildDirectionList(DocumentDto documentDto) {
 
-    // Search Pharmacy Data
-    List<PharmacyDto> pharmacyDtoList = pharmacySearchService.searchPharmacyDtoList();
-    // Calculate Distance then sort
+    if (Objects.isNull(documentDto)) {
+      return Collections.emptyList();
+    }
 
-    // Return List
-    return null;
+    // Search Pharmacy Data
+    // Calculate Distance then sort
+    return pharmacySearchService.searchPharmacyDtoList()
+        .stream().map(pharmacyDto ->
+            Direction.builder()
+                .inputAddress(documentDto.getAddressName())
+                .inputLatitude(documentDto.getLatitude())
+                .inputLongitude(documentDto.getLongitude())
+                .targetPharmacyName(pharmacyDto.getName())
+                .targetAddress(pharmacyDto.getAddress())
+                .targetLatitude(pharmacyDto.getLatitude())
+                .targetLongitude(pharmacyDto.getLongitude())
+                .distance(calculateDistance(documentDto.getLatitude(), documentDto.getLongitude(),
+                    pharmacyDto.getLatitude(), pharmacyDto.getLongitude())
+                )
+                .build())
+        .filter(direction -> direction.getDistance() <= RADIUS_KM)
+        .sorted((Comparator.comparingDouble(Direction::getDistance)))
+        .limit(MAX_SEARCH_COUNT)
+        .collect(Collectors.toList());
   }
 
   // Haversine formula
